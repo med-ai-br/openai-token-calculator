@@ -1,9 +1,15 @@
 import { encode, decode } from 'gpt-3-encoder'
+import { input } from '@inquirer/prompts';
 
-const str = "Testando essa desgraça."
+const str: string = await input({ message: 'Digite o texto para contar tokens:' });
 const encoded = encode(str)
 
-let representation = []
+type Representation = {
+    token: number;
+    string: string;
+}
+
+let representation: Representation[] = []
 for(let token of encoded){
     representation.push({token, string: decode([token])})
 }
