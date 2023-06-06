@@ -1,9 +1,9 @@
 import fs from 'fs/promises'
-import { encode, decode } from 'gpt-3-encoder'
 import chalk from 'chalk';
 import { input } from '@inquirer/prompts';
-import select from '@inquirer/select';
-import checkbox from '@inquirer/checkbox';
+import { stringOrArchiveChoice } from './inputSelect.js';
+import { returnChoicesCheckbox } from './inputChoices.js';
+import { tokenizer } from './tokenizer.js';
 
 function arrayContainsString(array: string[], string: string): boolean {
     for (let i = 0; i < array.length; i++) {
@@ -16,23 +16,7 @@ function arrayContainsString(array: string[], string: string): boolean {
 
 
 async function main() {
-    const answer = await select({
-        message: 'Escolha a opção desejada:',
-        choices: [
-            {
-                name: 'Contar tokens de um arquivo de texto',
-                value: 'archive',
-                description: 'Informe o local do arquivo e receba a contagem de tokens',
-            },
-            {
-                name: 'Contar tokens digitando o texto no terminal',
-                value: 'string',
-                description: 'Digite o texto no terminal e receba a contagem de tokens',
-            },
-        ],
-    });
-    if (!answer) throw new Error('Opção inválida.')
-
+    const answer = await stringOrArchiveChoice();
 
     let str: string
     if (answer === 'string') {
@@ -52,61 +36,31 @@ async function main() {
 
     let responseChoices: string[] = []
     while (responseChoices.length < 1) {
-        responseChoices = await checkbox({
-            message: 'Quais informações você deseja receber?',
-            choices: [
-                { name: 'Quantidade de tokens', value: 'tokens' },
-                { name: 'Texto encodado', value: 'encoding' },
-                { name: 'Representação', value: 'representation' },
-                { name: 'Texto decodificado', value: 'decoded' },
-                { name: 'Representação gráfica dos tokens', value: 'graph' },
-            ],
-        });
+        responseChoices = await returnChoicesCheckbox();
         if (responseChoices.length < 1) console.error(chalk.redBright('Nenhuma opção selecionada!'), chalk.yellowBright('Favor selecionar pelo menos uma opção.'));
     }
 
-
-    const encoded = encode(str)
-
-    type Representation = {
-        token: number;
-        string: string;
-    }
-
-    let representation: Representation[] = []
-    for (let i = 0; i < encoded.length; i++) {
-        const token = encoded[i]
-        const tokenString = decode([token])
-        representation.push({ token: token, string: tokenString })
-    }
-
-    const decoded = decode(encoded)
-
-
-    type Response = {
-        tokens?: number;
-        encoding?: number[];
-        representation?: Representation[];
-        decoded?: string;
-    }
+    const tokenized = tokenizer(str)
+    
+    type Response = Partial<typeof tokenized>
 
     const response: Response = {}
-    if (arrayContainsString(responseChoices, 'tokens')) response.tokens = encoded.length;
-    if (arrayContainsString(responseChoices, 'encoding')) response.encoding = encoded;
-    if (arrayContainsString(responseChoices, 'representation')) response.representation = representation;
-    if (arrayContainsString(responseChoices, 'decoded')) response.decoded = decoded;
+    if (arrayContainsString(responseChoices, 'tokens')) response.tokens = tokenized.tokens;
+    if (arrayContainsString(responseChoices, 'encoding')) response.encoding = tokenized.encoding;
+    if (arrayContainsString(responseChoices, 'representation')) response.representation = tokenized.representation;
+    if (arrayContainsString(responseChoices, 'decoded')) response.decoded = tokenized.decoded;
 
     console.log('')
     if (Object.keys(response).length > 0) console.log(response, '\n');
 
 
     if (arrayContainsString(responseChoices, 'graph')) {
-        for (let i = 0; i < representation.length; i++) {
-            if (i % 5 === 0) process.stdout.write(chalk.bgBlue(representation[i].string))
-            if (i % 5 === 1) process.stdout.write(chalk.bgGreen(representation[i].string))
-            if (i % 5 === 2) process.stdout.write(chalk.bgYellow(representation[i].string))
-            if (i % 5 === 3) process.stdout.write(chalk.bgRed(representation[i].string))
-            if (i % 5 === 4) process.stdout.write(chalk.bgGrey(representation[i].string))
+        for (let i = 0; i < tokenized.representation.length; i++) {
+            if (i % 5 === 0) process.stdout.write(chalk.bgBlue(tokenized.representation[i].string))
+            if (i % 5 === 1) process.stdout.write(chalk.bgGreen(tokenized.representation[i].string))
+            if (i % 5 === 2) process.stdout.write(chalk.bgYellow(tokenized.representation[i].string))
+            if (i % 5 === 3) process.stdout.write(chalk.bgRed(tokenized.representation[i].string))
+            if (i % 5 === 4) process.stdout.write(chalk.bgGrey(tokenized.representation[i].string))
         };
         console.log('\n');
     };

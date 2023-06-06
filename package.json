@@ -17,6 +17,7 @@
     "@inquirer/prompts": "^2.1.0",
     "@inquirer/select": "^1.2.1",
     "chalk": "^5.2.0",
+    "commander": "^10.0.1",
     "gpt-3-encoder": "^1.1.4"
   },
   "devDependencies": {
