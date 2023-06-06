@@ -1,0 +1,16 @@
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  gpt-3-encoder:
+    specifier: ^1.1.4
+    version: 1.1.4
+
+packages:
+
+  /gpt-3-encoder@1.1.4:
+    resolution: {integrity: sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==}
+    dev: false
