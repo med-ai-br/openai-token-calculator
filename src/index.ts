@@ -66,9 +66,13 @@ async function main() {
     };
 }
 
-try {
-    await main()
+async function run() {
+    try {
+        await main()
+    }
+    catch (error) {
+        console.error(error.message)
+    }  
 }
-catch (error) {
-    console.error(error.message)
-}
+
+run();

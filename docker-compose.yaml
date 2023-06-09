@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  medai-openai-token-counter:
+    container_name: medai-openai-token-counter
+    image: medai-openai-token-counter
+    build: .
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    stdin_open: true
+    tty: true
