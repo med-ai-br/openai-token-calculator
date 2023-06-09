@@ -16,12 +16,13 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
-          push: false
-          load: true
+          file: ./Dockerfile
+          outputs: type=docker,dest=- . > medai-openai-token-counter.tar
           tags: medai-openai-token-counter:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: List
-        run: ls
+        run: |
+          ls
+          docker images
