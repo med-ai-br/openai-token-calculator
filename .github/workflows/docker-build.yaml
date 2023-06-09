@@ -19,8 +19,8 @@ jobs:
           context: .
           push: false
           tags: medai-openai-token-counter:latest
-          cache-from: type=registry,ref=medai-openai-token-counter:latest
-          cache-to: type=registry,ref=medai-openai-token-counter:latest,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Save image to tarball
         run: docker save -o medai-openai-token-counter.tar medai-openai-token-counter
